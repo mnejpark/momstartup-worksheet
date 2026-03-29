@@ -38,16 +38,20 @@ body{font-family:'Noto Sans KR',sans-serif;background:#F8F7FC;color:#1A1A1A}
 .disc-inline-sub{font-size:13px;color:#666;line-height:1.5}
 .disc-inline-link{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:8px;text-decoration:none;background:#7B2FBE;color:#fff;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0}
 .section-card{background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,0.06);border:1px solid #E0E0E0}
-.section-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:12px}
+.section-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:12px}
 .section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
-.section-question{font-size:13.5px;font-weight:600;color:#1A1A1A;line-height:1.6;white-space:pre-line}
+.section-question{font-size:14px;font-weight:600;color:#1A1A1A;line-height:1.5}
 .ai-btn{flex-shrink:0;padding:8px 14px;border-radius:8px;border:none;cursor:pointer;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;white-space:nowrap;transition:opacity .15s;font-family:inherit}
 .ai-btn:disabled{background:#E0E0E0!important;cursor:not-allowed;opacity:.7}
 .spinner{display:inline-block;width:12px;height:12px;border:2px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.field-row{margin-bottom:12px}
+.field-label{font-size:12px;font-weight:700;color:#444;margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.field-num{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
 textarea{width:100%;border-radius:8px;border:1.5px solid #E0E0E0;padding:10px 12px;font-size:14px;color:#1A1A1A;line-height:1.7;resize:vertical;outline:none;font-family:inherit;background:#FAFAFA;transition:border-color .15s}
 textarea:focus{border-color:var(--focus-color,#7B2FBE)}
-.ai-result{margin-top:12px;background:#F0E8FF;border:1.5px solid #B39DDB;border-radius:10px;padding:14px 16px}
+.field-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.ai-result{margin-top:14px;background:#F0E8FF;border:1.5px solid #B39DDB;border-radius:10px;padding:14px 16px}
 .ai-result-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .ai-result-label{font-size:11px;font-weight:700;color:#7B2FBE;text-transform:uppercase;letter-spacing:.06em}
 .ai-result-close{background:none;border:none;cursor:pointer;color:#666;font-size:16px;font-family:inherit}
@@ -58,6 +62,7 @@ textarea:focus{border-color:var(--focus-color,#7B2FBE)}
 .nav-prev:disabled{color:#ccc;cursor:not-allowed}
 .nav-next{padding:10px 24px;border-radius:10px;border:none;color:#fff;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit}
 .footer{text-align:center;margin-top:36px;font-size:12px;color:#999}
+@media(max-width:600px){.field-pair{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -76,72 +81,217 @@ textarea:focus{border-color:var(--focus-color,#7B2FBE)}
 <div class="tabs"><div class="tabs-inner" id="tabs-container"></div></div>
 <div class="content" id="main-content"></div>
 <script>
-const DISC_URL="https://mnejpark.github.io/disc-test/";
-const API_ENDPOINT="/api/chat";
-const values={};
-const STAGES=[
+var DISC_URL="https://mnejpark.github.io/disc-test/";
+var API_ENDPOINT="/api/chat";
+var values={};
+
+var STAGES=[
   {id:1,label:"1단계",title:"가치관 재정립",color:"#7B2FBE",lightBg:"#F0E8FF",desc:"창업의 뿌리가 되는 나만의 가치관을 정립합니다",
     sections:[
-      {id:"s1q1",label:"가치관 질문 1",question:"나는 지금 누구를 위해 살고 있나요?",rows:3,disc:false,ai:(v)=>`창업을 준비하는 여성이 이렇게 답했습니다: "${v}"\n\n창업 동기와 삶의 방향을 3문장으로 요약하고, 창업과 연결되는 한 줄을 써주세요.`},
-      {id:"s1q2",label:"가치관 질문 2",question:"나는 지금 무엇을 위해 살고 있나요?",rows:3,disc:false,ai:(v)=>`이렇게 답했습니다: "${v}"\n\n창업과 연결될 수 있는 핵심 가치 키워드 3개를 뽑고 각각 한 줄로 설명해주세요.`},
-      {id:"s1clock",label:"120세 시계 — 남은 시간에 하고 싶은 것",question:"내 나이 ÷ 5 = 현재 몇 시 (예: 40살 → 8시)\n\n남은 시간에 하고 싶은 것들을 자유롭게 적어보세요.",rows:5,disc:false,ai:(v)=>`남은 시간에 하고 싶은 것: "${v}"\n\n이 소망들과 창업을 연결해 2~3문장으로 써주세요.`},
+      {id:"s1q1",label:"가치관 질문 1",question:"나는 지금 누구를 위해 살고 있나요?",
+        fields:[{id:"s1q1_a",label:"나의 답변",ph:"자유롭게 적어보세요...",rows:3}],
+        ai:function(g){return '이렇게 답했습니다: "'+g("s1q1_a")+'"\n\n창업 동기와 삶의 방향을 3문장으로 요약하고, 창업과 연결되는 한 줄을 써주세요.';}},
+      {id:"s1q2",label:"가치관 질문 2",question:"나는 지금 무엇을 위해 살고 있나요?",
+        fields:[{id:"s1q2_a",label:"나의 답변",ph:"자유롭게 적어보세요...",rows:3}],
+        ai:function(g){return '이렇게 답했습니다: "'+g("s1q2_a")+'"\n\n창업과 연결될 수 있는 핵심 가치 키워드 3개를 뽑고 각각 한 줄로 설명해주세요.';}},
+      {id:"s1clock",label:"120세 시계 워크숍",question:"내 나이 ÷ 5 = 현재 몇 시  (예: 40살 → 8시)",
+        fields:[
+          {id:"s1clock_age",label:"내 나이",ph:"예) 42살",rows:1},
+          {id:"s1clock_time",label:"120세 시계로 몇 시?",ph:"예) 8시 (= 42 ÷ 5 ≈ 8)",rows:1},
+          {id:"s1clock_wish",label:"남은 시간에 하고 싶은 것들",ph:"자유롭게 적어보세요...",rows:4}
+        ],
+        ai:function(g){return '나이: '+g("s1clock_age")+' / 시계: '+g("s1clock_time")+'\n하고 싶은 것: '+g("s1clock_wish")+'\n\n이 소망들과 창업을 연결해 2~3문장으로 구체적으로 써주세요.';}},
     ]},
+
   {id:2,label:"2단계",title:"나에 대해 깨닫기",color:"#E84500",lightBg:"#FFF3EF",desc:"자기 대화를 통해 강점을 발견하고 DISC 유형과 연결합니다",discBanner:true,
     sections:[
-      {id:"s2q1",label:"행복·즐거움",question:"무엇을 할 때 제일 행복해?\n무엇을 하며 시간 보낼 때 가장 즐거워?",rows:3,disc:false,ai:null},
-      {id:"s2q2",label:"어려움·분노",question:"무엇을 할 때 가장 참기 힘들어?\n언제 화가 나?",rows:3,disc:false,ai:null},
-      {id:"s2q3",label:"사람·자랑스러운 순간",question:"어떤 사람들과 있으면 행복해?\n살면서 가장 자랑스러웠던 순간은?",rows:3,disc:false,ai:null},
-      {id:"s2q4",label:"목표·두려움",question:"인생의 목표는 뭐야?\n지금 가장 두려운 것은?",rows:3,disc:false,ai:null},
-      {id:"s2strength",label:"나의 강점 2가지 질문",question:"남들과 비교할 수 없는 나만의 장점은?\n\n내가 가장 잘 할 수 있는 것은?",rows:4,disc:false,
-        ai:(v)=>{
-          const ctx="행복: "+(values.s2q1||"")+" / 어려움: "+(values.s2q2||"")+" / 자랑: "+(values.s2q3||"")+" / 목표: "+(values.s2q4||"");
-          return "자기 성찰:\n"+ctx+"\n강점: "+v+"\n\n창업 강점 3가지와 각각 활용법을 한 줄씩 써주세요.";
+      {id:"s2q1",label:"행복과 즐거움",question:"당신은 당신과 대화해 본 적 있나요?",
+        fields:[
+          {id:"s2q1_a",label:"무엇을 할 때 제일 행복해?",ph:"",rows:2},
+          {id:"s2q1_b",label:"무엇을 하며 시간 보낼 때 가장 즐거워?",ph:"",rows:2}
+        ],ai:null},
+      {id:"s2q2",label:"어려움과 분노",question:"",
+        fields:[
+          {id:"s2q2_a",label:"무엇을 할 때 가장 참기 힘들어?",ph:"",rows:2},
+          {id:"s2q2_b",label:"너는 언제 화가 나?",ph:"",rows:2}
+        ],ai:null},
+      {id:"s2q3",label:"사람과 자랑스러운 순간",question:"",
+        fields:[
+          {id:"s2q3_a",label:"어떤 사람들과 있으면 행복해?",ph:"",rows:2},
+          {id:"s2q3_b",label:"살면서 가장 자랑스러웠던 순간은?",ph:"",rows:2}
+        ],ai:null},
+      {id:"s2q4",label:"목표와 두려움",question:"",
+        fields:[
+          {id:"s2q4_a",label:"너의 인생의 목표는 뭐야?",ph:"",rows:2},
+          {id:"s2q4_b",label:"지금 가장 두려운 것은 무엇이야?",ph:"",rows:2}
+        ],ai:null},
+      {id:"s2str",label:"나의 강점 2가지 질문",question:"자존감 상승을 위한 핵심 질문",
+        fields:[
+          {id:"s2str_a",label:"남들과 비교할 수 없는 나만의 장점은?",ph:"",rows:3},
+          {id:"s2str_b",label:"내가 가장 잘 할 수 있는 것은?",ph:"",rows:3}
+        ],
+        ai:function(g){
+          var ctx="행복: "+g("s2q1_a")+" / 즐거움: "+g("s2q1_b")+" / 어려움: "+g("s2q2_a")+" / 목표: "+g("s2q4_a");
+          return "자기 성찰 내용:\n"+ctx+"\n장점: "+g("s2str_a")+"\n잘하는 것: "+g("s2str_b")+"\n\n위 내용을 종합해 창업 강점 3가지를 정리하고, 각각 창업에서 어떻게 활용할 수 있는지 한 줄씩 써주세요.";
         }},
-      {id:"s2disc",label:"DISC 유형 & 창업 강점 연결",question:"DISC 진단 결과 유형: (D / I / S / C)\n\n이 유형의 창업 강점을 내 말로 적어보세요.\n\n창업과 연결하면:",rows:6,disc:true,ai:(v)=>`DISC 결과: "${v}"\n\n이 유형의 창업 강점, 주의점, 잘 맞는 창업 분야 2가지를 알려주세요.`},
+      {id:"s2disc",label:"DISC 유형 & 창업 강점 연결",question:"DISC 진단 결과를 입력해보세요",disc:true,
+        fields:[
+          {id:"s2disc_type",label:"내 DISC 유형 (D / I / S / C 중 선택)",ph:"예) I형",rows:1},
+          {id:"s2disc_str",label:"이 유형의 창업 강점 (내 말로)",ph:"",rows:3},
+          {id:"s2disc_link",label:"창업과 연결하면?",ph:"",rows:2}
+        ],
+        ai:function(g){return 'DISC 유형: '+g("s2disc_type")+'\n강점: '+g("s2disc_str")+'\n\nDISC 유형 특성을 바탕으로 창업 강점, 주의점, 잘 맞는 창업 분야 2가지를 구체적으로 알려주세요.';}},
     ]},
+
   {id:3,label:"3단계",title:"아이템 만들기",color:"#7B2FBE",lightBg:"#F0E8FF",desc:"시네틱스 방법으로 나만의 창업 아이템을 도출합니다",
     sections:[
-      {id:"s3vp",label:"Vitamin vs Painkiller",question:"Vitamin (활력·Nice to Have) 아이디어:\n\nPainkiller (필수·Must Have) 아이디어:",rows:5,disc:false,ai:null},
-      {id:"s3synectics",label:"시네틱스 — 내가 잘하는 것 & 좋아하는 것",question:"내가 잘하는 것:\n\n내가 좋아하는 것:",rows:5,disc:false,
-        ai:(v)=>"예비 여성창업가의 강점과 관심사:\n"+v+"\n\n시네틱스(Synectics) 방법으로 창업 아이디어를 만들어주세요.\n\n먼저 트렌드·사회변화·일상에서 무작위 요소 3가지를 뽑고, 위 강점·관심사와 조합해 아이디어 4가지를 아래 형식으로 제안해주세요:\n\n[무작위 요소]\n1. \n2. \n3. \n\n[아이디어]\n아이디어 1: \n유형: Vitamin / Painkiller\n설명: \n시장성: 상/중/하\n\n아이디어 2: \n유형: \n설명: \n시장성: \n\n아이디어 3: \n유형: \n설명: \n시장성: \n\n아이디어 4: \n유형: \n설명: \n시장성: \n\n추천 아이디어: "},
-      {id:"s3final",label:"최종 선택 아이템 & 이유",question:"선택한 아이템:\n\n선택 이유:",rows:4,disc:false,ai:(v)=>`선택 아이템: "${v}"\n\n핵심 강점, 타깃 고객, 첫 번째 실행 단계 3가지를 응원하는 톤으로 알려주세요.`},
+      {id:"s3vp",label:"Vitamin vs Painkiller",question:"내 아이디어는 어느 쪽인가요?",
+        fields:[
+          {id:"s3vp_v",label:"VITAMIN — 삶의 활력을 주는 아이디어 (Nice to Have)",ph:"예) 힐링 글쓰기 키트, 감성 공예 클래스",rows:3},
+          {id:"s3vp_p",label:"PAINKILLER — 삶에 꼭 필요한 아이디어 (Must Have)",ph:"예) 경력단절 재취업 교육, 육아 정보 서비스",rows:3}
+        ],ai:null},
+      {id:"s3syn",label:"시네틱스 — AI 아이디어 생성",question:"잘하는 것과 좋아하는 것을 입력하면 AI가 창업 아이디어 4가지를 만들어드려요!",
+        fields:[
+          {id:"s3syn_a",label:"내가 잘하는 것",ph:"예) 글쓰기, 요리, 디자인, 강의, 상담, 사진...",rows:2},
+          {id:"s3syn_b",label:"내가 좋아하는 것",ph:"예) 커피, 여행, 독서, 아이들, 환경, 운동...",rows:2}
+        ],
+        ai:function(g){return "예비 여성창업가의 강점과 관심사:\n잘하는 것: "+g("s3syn_a")+"\n좋아하는 것: "+g("s3syn_b")+"\n\n시네틱스(Synectics) 방법으로 창업 아이디어를 만들어주세요.\n\n먼저 트렌드·사회변화·일상에서 무작위 요소 3가지를 뽑고, 위 강점·관심사와 조합해 아이디어 4가지를 아래 형식으로 제안해주세요:\n\n[무작위 요소]\n1. \n2. \n3. \n\n아이디어 1: \n유형: Vitamin 또는 Painkiller\n한 줄 설명: \n시장성: 상/중/하\n\n아이디어 2: \n유형: \n한 줄 설명: \n시장성: \n\n아이디어 3: \n유형: \n한 줄 설명: \n시장성: \n\n아이디어 4: \n유형: \n한 줄 설명: \n시장성: \n\n추천 아이디어와 이유: ";}},
+      {id:"s3final",label:"최종 선택 아이템",question:"AI 제안을 참고해 최종 아이템을 선택하세요",
+        fields:[
+          {id:"s3final_item",label:"선택한 아이템",ph:"",rows:2},
+          {id:"s3final_why",label:"선택 이유",ph:"",rows:3}
+        ],
+        ai:function(g){return '선택 아이템: "'+g("s3final_item")+'"\n이유: '+g("s3final_why")+'\n\n이 아이템의 핵심 강점, 타깃 고객, 첫 번째 실행 단계 3가지를 응원하는 톤으로 알려주세요.';}},
     ]},
+
   {id:4,label:"4단계",title:"사업계획서 만들기",color:"#E84500",lightBg:"#FFF3EF",desc:"사업의 설계도인 사업계획서의 핵심을 작성합니다",
     sections:[
-      {id:"s4biz",label:"좋은 사업 기준 자가 체크",question:"경쟁력 (나만의 차별점):\n지속력 (반복 구매·이용 가능성):\n명확한 가치제안:\n수익구조 선순환:\n모방 불가능성:",rows:7,disc:false,ai:null},
-      {id:"s4nine",label:"수익구조 필수 9가지 요소",question:"① 가치제안:\n② 고객:\n③ 홍보:\n④ 판매채널:\n⑤ 매출방식:\n⑥ 핵심자원:\n⑦ 핵심활동:\n⑧ 핵심파트너:\n⑨ 비용:",rows:11,disc:false,
-        ai:(v)=>"아이템: "+(values.s3final||"")+"내용: "+v+"\n\n각 요소를 더 구체적으로 채워주세요. 번호 형식 그대로 답변해주세요."},
-      {id:"s4gov",label:"신청할 정부지원사업 계획",question:"관심 지원사업:\n신청 이유:\n준비할 것:",rows:5,disc:false,
-        ai:(v)=>"관심 지원사업: "+v+" / 아이템: "+(values.s3final||"")+"\n\n준비 체크리스트와 신청 시 강조할 포인트를 알려주세요."},
+      {id:"s4biz",label:"좋은 사업 기준 자가 체크",question:"내 아이템은 어떤가요? 각 항목에 솔직하게 작성해보세요",
+        fields:[
+          {id:"s4biz_1",label:"① 경쟁력 — 나만의 차별점은?",ph:"",rows:2},
+          {id:"s4biz_2",label:"② 지속력 — 반복 구매·이용 가능성은?",ph:"",rows:2},
+          {id:"s4biz_3",label:"③ 명확한 가치제안 — 고객이 느끼는 핵심 가치는?",ph:"",rows:2},
+          {id:"s4biz_4",label:"④ 수익구조 선순환 — 돈이 돌아오는 구조는?",ph:"",rows:2},
+          {id:"s4biz_5",label:"⑤ 모방 불가능성 — 나만이 할 수 있는 이유는?",ph:"",rows:2}
+        ],ai:null},
+      {id:"s4nine",label:"수익구조 필수 9가지 요소",question:"비즈니스 모델의 핵심 9가지를 채워보세요",
+        fields:[
+          {id:"s4nine_1",label:"① 가치제안 — 고객에게 어떤 가치를 줄 것인가?",ph:"",rows:2},
+          {id:"s4nine_2",label:"② 고객 — 누구에게 팔 것인가?",ph:"",rows:2},
+          {id:"s4nine_3",label:"③ 홍보 — 어떻게 알릴 것인가?",ph:"",rows:2},
+          {id:"s4nine_4",label:"④ 판매채널 — 어디서, 어떻게 판매할 것인가?",ph:"",rows:2},
+          {id:"s4nine_5",label:"⑤ 매출방식 — 어떻게 수익을 낼 것인가?",ph:"",rows:2},
+          {id:"s4nine_6",label:"⑥ 핵심자원 — 어떤 자원(사람·장비·공간)이 필요한가?",ph:"",rows:2},
+          {id:"s4nine_7",label:"⑦ 핵심활동 — 사업 유지를 위한 핵심 활동은?",ph:"",rows:2},
+          {id:"s4nine_8",label:"⑧ 핵심파트너 — 협력해야 할 외부 파트너는?",ph:"",rows:2},
+          {id:"s4nine_9",label:"⑨ 비용 — 운영에 필요한 주요 비용 항목은?",ph:"",rows:2}
+        ],
+        ai:function(g){
+          var item=g("s3final_item");
+          var content="①가치제안: "+g("s4nine_1")+"\n②고객: "+g("s4nine_2")+"\n③홍보: "+g("s4nine_3")+"\n④채널: "+g("s4nine_4")+"\n⑤매출: "+g("s4nine_5")+"\n⑥자원: "+g("s4nine_6")+"\n⑦활동: "+g("s4nine_7")+"\n⑧파트너: "+g("s4nine_8")+"\n⑨비용: "+g("s4nine_9");
+          return "아이템: "+item+"\n\n작성 내용:\n"+content+"\n\n빠진 부분을 채우고 각 요소를 더 구체적으로 발전시켜주세요. ①~⑨ 번호 형식 그대로 답변해주세요.";
+        }},
+      {id:"s4gov",label:"정부지원사업 신청 계획",question:"단계별 정부지원사업을 활용해보세요",
+        fields:[
+          {id:"s4gov_1",label:"관심 있는 지원사업",ph:"예) 예비창업패키지, 초기창업패키지, 신사업창업사관학교...",rows:2},
+          {id:"s4gov_2",label:"신청 이유",ph:"",rows:2},
+          {id:"s4gov_3",label:"준비할 것",ph:"",rows:2}
+        ],
+        ai:function(g){return "관심 지원사업: "+g("s4gov_1")+"\n아이템: "+g("s3final_item")+"\n\n이 지원사업 신청을 위한 준비 체크리스트와 신청 시 강조할 포인트를 알려주세요.";}},
     ]},
+
   {id:5,label:"5단계",title:"나만의 퍼널 만들기",color:"#7B2FBE",lightBg:"#F0E8FF",desc:"고객을 찾고 SNS로 나만의 판매 퍼널을 설계합니다",
     sections:[
-      {id:"s5funnel",label:"내 아이템 퍼널 4단계 설계",question:"① 광고·노출 (어디서 어떻게 알릴까?):\n\n② 관심·방문 (어떻게 끌어올까?):\n\n③ 탐색·고려 (어떻게 설득할까?):\n\n④ 구매·행동 (어떻게 살게 할까?):",rows:8,disc:false,
-        ai:(v)=>"퍼널: "+v+" / 아이템: "+(values.s3final||"")+"\n\n각 단계별 액션 2가지씩, 가장 먼저 집중할 단계, SNS 첫 번째 행동을 알려주세요."},
-      {id:"s5case",label:"데일리보자기 사례 — 내 창업에 적용",question:"데일리보자기(3.5만원→팔로워1만→설화수500장)에서\n내 창업에 바로 적용할 수 있는 것:",rows:4,disc:false,ai:null},
-      {id:"s5caption",label:"AI 실습 — 인스타그램 첫 게시물 캡션",question:"내 아이템:\n타깃 고객:\n핵심 가치:\n원하는 톤:\n\n[Claude가 생성한 캡션을 여기에 붙여넣고 다듬어보세요]",rows:9,disc:false,
-        ai:(v)=>"정보: "+v+" / 아이템: "+(values.s3final||"")+"\n\n인스타그램 캡션 3가지 버전(스토리텔링형/가치소개형/공감형)을 각 150자 내외, 해시태그 5개 포함해서 작성해주세요."},
+      {id:"s5funnel",label:"내 아이템 퍼널 4단계 설계",question:"고객이 구매까지 이르는 과정을 설계해보세요",
+        fields:[
+          {id:"s5funnel_1",label:"① 광고·노출 — 어디서 어떻게 알릴까?",ph:"예) 인스타그램 게시물, 블로그, 지인 소개...",rows:2},
+          {id:"s5funnel_2",label:"② 관심·방문 — 어떻게 끌어올까?",ph:"예) 프로필 클릭, DM 문의, 팔로우 유도...",rows:2},
+          {id:"s5funnel_3",label:"③ 탐색·고려 — 어떻게 설득할까?",ph:"예) 상세페이지, 후기·리뷰, 무료 체험...",rows:2},
+          {id:"s5funnel_4",label:"④ 구매·행동 — 어떻게 살게 할까?",ph:"예) 구매 버튼, 신청 폼, 한정 혜택...",rows:2}
+        ],
+        ai:function(g){
+          var content="①노출: "+g("s5funnel_1")+"\n②관심: "+g("s5funnel_2")+"\n③고려: "+g("s5funnel_3")+"\n④구매: "+g("s5funnel_4");
+          return "아이템: "+g("s3final_item")+"\n퍼널: "+content+"\n\n각 단계별 구체적 액션 2가지씩, 가장 먼저 집중할 단계와 이유, SNS로 시작할 수 있는 현실적인 첫 번째 행동을 알려주세요.";
+        }},
+      {id:"s5case",label:"데일리보자기 사례 적용",question:"데일리보자기: 3만 5천 원 → 팔로워 1만 → 설화수 500장 주문",
+        fields:[{id:"s5case_a",label:"내 창업에 바로 적용할 수 있는 것",ph:"",rows:4}],ai:null},
+      {id:"s5caption",label:"AI 실습 — 인스타그램 첫 게시물",question:"정보를 입력하면 AI가 캡션 3가지를 만들어드려요",
+        fields:[
+          {id:"s5cap_item",label:"내 아이템",ph:"",rows:1},
+          {id:"s5cap_target",label:"타깃 고객",ph:"예) 30~40대 경력단절 여성",rows:1},
+          {id:"s5cap_value",label:"핵심 가치",ph:"예) 자립, 감성, 실용성",rows:1},
+          {id:"s5cap_tone",label:"원하는 톤",ph:"예) 따뜻하고 진정성 있게 / 트렌디하고 밝게",rows:1},
+          {id:"s5cap_result",label:"AI가 생성한 캡션 — 여기에 붙여넣고 다듬어보세요",ph:"AI 도움받기 클릭 후 결과를 여기에 메모하세요",rows:5}
+        ],
+        ai:function(g){return "아이템: "+g("s5cap_item")+"\n타깃: "+g("s5cap_target")+"\n핵심 가치: "+g("s5cap_value")+"\n톤: "+g("s5cap_tone")+"\n\n인스타그램 첫 게시물 캡션 3가지 버전을 작성해주세요:\n\n버전1 — 스토리텔링형 (창업 계기)\n버전2 — 가치소개형 (고객 문제 해결)\n버전3 — 공감형 (타깃 일상 공감)\n\n각 버전 150자 내외, 해시태그 5개 포함. 첫 문장은 스크롤을 멈추게 하는 문장으로.";
+        }},
     ]},
+
   {id:6,label:"6단계",title:"엄마 기업가정신",color:"#1B8A4C",lightBg:"#E8F5E9",desc:"창업가로서의 정체성을 확립하고 실행을 선언합니다",
     sections:[
-      {id:"s6def",label:"나만의 기업가정신 정의",question:"드러커: 기회를 통한 혁신과 실행\n슘페터: 새로운 조합으로 경제 발전을 이끄는 혁신\n\n나만의 정의:\n\"기업가정신이란",rows:4,disc:false,
-        ai:(v)=>"나만의 정의: "+v+"\n\n좋은 점을 칭찬하고, 드러커·슘페터 관점에서 발전시킬 방향을 제안해주세요."},
-      {id:"s6axis",label:"여성 기업가정신 3가지 축 성찰",question:"축 1 — 나의 돌봄과 일의 균형은?\n\n축 2 — 창업가로서 내 강점은?\n\n축 3 — 내 돌봄 경험이 창업 아이디어가 되는 지점은?",rows:8,disc:false,
-        ai:(v)=>"성찰: "+v+"\n\n'여성 기업가로서의 나'를 한 단락 선언문으로 따뜻하고 힘차게 써주세요."},
-      {id:"s6fear",label:"실행을 망설이는 이유 & 극복 한 마디",question:"망설이는 이유 1:          극복 한 마디:\n\n망설이는 이유 2:          극복 한 마디:\n\n망설이는 이유 3:          극복 한 마디:",rows:6,disc:false,
-        ai:(v)=>"두려움: "+v+"\n\n각 두려움에 현실적이고 용기를 주는 맞춤 조언을 주세요."},
-      {id:"s6declare",label:"나의 창업 선언문",question:"나, (이름)의 창업 핵심 가치는:\n나의 타깃 고객은:\n내가 가진 가장 큰 창업 강점은:\n오늘부터 7일 안에 실행할 한 가지:",rows:6,disc:false,
-        ai:(v)=>"선언문: "+v+"\n\n더 강력하고 구체적으로 다듬고, 7일 실행 계획을 제안해주세요. 응원 메시지로 마무리해주세요."},
+      {id:"s6def",label:"나만의 기업가정신 정의",question:"드러커: 기회를 통한 혁신과 실행 / 슘페터: 새로운 조합으로 경제 발전을 이끄는 혁신",
+        fields:[{id:"s6def_a",label:"나만의 정의 — '기업가정신이란...'으로 시작해보세요",ph:"기업가정신이란 ",rows:4}],
+        ai:function(g){return '나만의 정의: "'+g("s6def_a")+'"\n\n좋은 점을 칭찬하고, 드러커·슘페터 관점에서 더 풍부하게 발전시킬 방향을 제안해주세요.';}},
+      {id:"s6axis",label:"여성 기업가정신 3가지 축 성찰",question:"3가지 축에 대해 각각 생각해보세요",
+        fields:[
+          {id:"s6axis_1",label:"축 1 — 나의 '돌봄과 일의 균형'은 어떤 모습인가요?",ph:"",rows:3},
+          {id:"s6axis_2",label:"축 2 — 창업가로서 내 강점은 무엇인가요?",ph:"",rows:3},
+          {id:"s6axis_3",label:"축 3 — 내 돌봄 경험이 창업 아이디어가 되는 지점은?",ph:"",rows:3}
+        ],
+        ai:function(g){return "균형: "+g("s6axis_1")+"\n강점: "+g("s6axis_2")+"\n경험 연결: "+g("s6axis_3")+"\n\n이 분의 성찰을 바탕으로 '여성 기업가로서의 나'를 한 단락 선언문으로 따뜻하고 힘차게 써주세요.";}},
+      {id:"s6fear",label:"실행을 망설이는 이유 & 극복 한 마디",question:"두려움을 솔직하게 적고, 극복할 한 마디도 써보세요",
+        fields:[
+          {id:"s6fear_1a",label:"망설이는 이유 1",ph:"",rows:2},
+          {id:"s6fear_1b",label:"극복 한 마디",ph:"",rows:2},
+          {id:"s6fear_2a",label:"망설이는 이유 2",ph:"",rows:2},
+          {id:"s6fear_2b",label:"극복 한 마디",ph:"",rows:2},
+          {id:"s6fear_3a",label:"망설이는 이유 3",ph:"",rows:2},
+          {id:"s6fear_3b",label:"극복 한 마디",ph:"",rows:2}
+        ],
+        ai:function(g){return "두려움1: "+g("s6fear_1a")+"\n두려움2: "+g("s6fear_2a")+"\n두려움3: "+g("s6fear_3a")+"\n\n각 두려움에 현실적이고 용기를 주는 맞춤 조언을 해주세요. 비슷한 두려움을 극복한 여성 창업가 사례도 짧게 언급해주세요.";}},
+      {id:"s6dec",label:"나의 창업 선언문",question:"오늘 강의를 마치며 창업가로서 나 자신에게 선언합니다",
+        fields:[
+          {id:"s6dec_1",label:"나의 창업 핵심 가치는",ph:"",rows:2},
+          {id:"s6dec_2",label:"나의 타깃 고객은",ph:"",rows:2},
+          {id:"s6dec_3",label:"내가 가진 가장 큰 창업 강점은",ph:"",rows:2},
+          {id:"s6dec_4",label:"오늘부터 7일 안에 실행할 한 가지",ph:"가장 작고 구체적인 것으로!",rows:2}
+        ],
+        ai:function(g){return "핵심 가치: "+g("s6dec_1")+"\n타깃: "+g("s6dec_2")+"\n강점: "+g("s6dec_3")+"\n7일 실행: "+g("s6dec_4")+"\n아이템: "+g("s3final_item")+"\n\n이 선언문을 더 강력하고 구체적으로 다듬고, 7일 실행 계획을 더 구체적으로 제안해주세요. 창업 멘토로서 따뜻한 응원 메시지로 마무리해주세요.";}},
     ]},
 ];
-let activeStage=0;
-function getTotalCounts(){let f=0,t=0;STAGES.forEach(function(st){st.sections.forEach(function(sec){t++;if((values[sec.id]||"").trim())f++;});});return{filled:f,total:t};}
-function getStageCounts(st){let f=0;st.sections.forEach(function(sec){if((values[sec.id]||"").trim())f++;});return{filled:f,total:st.sections.length};}
+
+function getFieldIds(sec){
+  var ids=[];
+  if(sec.fields){sec.fields.forEach(function(f){ids.push(f.id);});}
+  else{ids.push(sec.id);}
+  return ids;
+}
+
+function getTotalCounts(){
+  var f=0,t=0;
+  STAGES.forEach(function(st){
+    st.sections.forEach(function(sec){
+      getFieldIds(sec).forEach(function(id){t++;if((values[id]||"").trim())f++;});
+    });
+  });
+  return{filled:f,total:t};
+}
+
+function getStageCounts(st){
+  var f=0,t=0;
+  st.sections.forEach(function(sec){
+    getFieldIds(sec).forEach(function(id){t++;if((values[id]||"").trim())f++;});
+  });
+  return{filled:f,total:t};
+}
+
+var activeStage=0;
+
 function renderTabs(){
-  const c=document.getElementById("tabs-container");c.innerHTML="";
+  var c=document.getElementById("tabs-container");c.innerHTML="";
   STAGES.forEach(function(st,i){
-    const r=getStageCounts(st);const done=r.filled===r.total;
-    const btn=document.createElement("button");
+    var r=getStageCounts(st);var done=r.filled===r.total&&r.total>0;
+    var btn=document.createElement("button");
     btn.className="tab-btn"+(i===activeStage?" active":"");
     btn.style.setProperty("--color",st.color);
     btn.innerHTML='<div style="display:flex;align-items:center;gap:4px">'+(done?'<span style="color:#1B8A4C;font-size:10px">✓</span> ':'')+st.label+'</div><div style="font-size:9.5px;opacity:.75;margin-top:1px">'+st.title+'</div>';
@@ -149,26 +299,37 @@ function renderTabs(){
     c.appendChild(btn);
   });
 }
+
 function renderContent(){
-  const st=STAGES[activeStage];
-  const r=getStageCounts(st);
-  const pct=Math.round(r.filled/r.total*100);
-  let html='<div class="stage-hero" style="background:'+st.lightBg+';--color:'+st.color+'">';
+  var st=STAGES[activeStage];
+  var r=getStageCounts(st);
+  var pct=r.total>0?Math.round(r.filled/r.total*100):0;
+  var html='<div class="stage-hero" style="background:'+st.lightBg+';--color:'+st.color+'">';
   html+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">';
   html+='<div><div class="stage-label" style="color:'+st.color+'">'+st.label+'</div><div class="stage-title">'+st.title+'</div><div class="stage-desc">'+st.desc+'</div></div>';
   html+='<div style="text-align:right"><div style="font-size:11px;color:#666;margin-bottom:5px">'+r.filled+'/'+r.total+' 완성</div><div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%;background:'+st.color+'"></div></div></div>';
   html+='</div></div>';
-  html+='<div class="ai-tip"><span style="font-size:15px;flex-shrink:0">✦</span><span>내용을 먼저 작성한 후 <b>AI 도움받기</b>를 누르면 Claude가 맞춤 제안을 드립니다!</span></div>';
+  html+='<div class="ai-tip"><span style="font-size:15px;flex-shrink:0">✦</span><span>각 항목을 작성한 후 <b>AI 도움받기</b>를 누르면 Claude가 맞춤 제안을 드립니다!</span></div>';
   if(st.discBanner){
     html+='<div class="disc-banner"><div class="disc-banner-text"><div class="disc-banner-badge">2단계 시작 전 필수</div><div class="disc-banner-title">DISC 창업가 유형 진단을 먼저 해보세요!</div><div class="disc-banner-sub">진단 결과를 가지고 돌아와 작성하면 훨씬 정확해요</div></div><a href="'+DISC_URL+'" target="_blank" class="disc-link">진단하러 가기 →</a></div>';
   }
   st.sections.forEach(function(sec){
-    const val=values[sec.id]||"";
-    html+='<div class="section-card"><div class="section-head"><div style="flex:1"><div class="section-label" style="color:'+st.color+'">'+sec.label+'</div><div class="section-question">'+sec.question+'</div></div>';
+    html+='<div class="section-card">';
+    html+='<div class="section-head"><div style="flex:1"><div class="section-label" style="color:'+st.color+'">'+sec.label+'</div>';
+    if(sec.question){html+='<div class="section-question">'+sec.question+'</div>';}
+    html+='</div>';
     if(sec.ai){html+='<button class="ai-btn" style="background:'+st.color+'" onclick="askAI(\''+sec.id+'\')" id="aibtn-'+sec.id+'">✦ AI 도움받기</button>';}
     html+='</div>';
     if(sec.disc){html+='<div class="disc-inline"><div><div class="disc-inline-title">DISC 창업 행동유형 진단</div><div class="disc-inline-sub">아직 진단을 안 하셨나요?</div></div><a href="'+DISC_URL+'" target="_blank" class="disc-inline-link">↗ DISC 진단하기</a></div>';}
-    html+='<textarea rows="'+sec.rows+'" placeholder="여기에 직접 작성해보세요..." style="--focus-color:'+st.color+'" oninput="updateVal(\''+sec.id+'\',this.value)">'+val+'</textarea>';
+
+    if(sec.fields){
+      sec.fields.forEach(function(field){
+        html+='<div class="field-row">';
+        html+='<div class="field-label"><span style="background:'+st.color+';width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0"></span> '+field.label+'</div>';
+        html+='<textarea rows="'+(field.rows||2)+'" placeholder="'+(field.ph||'작성해보세요...')+'" style="--focus-color:'+st.color+'" oninput="updateVal(\''+field.id+'\',this.value)">'+(values[field.id]||'')+'</textarea>';
+        html+='</div>';
+      });
+    }
     html+='<div id="airesult-'+sec.id+'" style="display:none"></div></div>';
   });
   html+='<div class="nav-row">';
@@ -178,49 +339,73 @@ function renderContent(){
   html+='</div><div class="footer">ⓒ 창업멘토 박은정 · ㈜이제이임팩트 · @eco_business_creator</div>';
   document.getElementById("main-content").innerHTML=html;
 }
-function render(){renderTabs();renderContent();const r=getTotalCounts();document.getElementById("total-progress").textContent=r.filled+"/"+r.total+" 완성";}
-function updateVal(id,val){values[id]=val;const r=getTotalCounts();document.getElementById("total-progress").textContent=r.filled+"/"+r.total+" 완성";renderTabs();}
+
+function render(){renderTabs();renderContent();var r=getTotalCounts();document.getElementById("total-progress").textContent=r.filled+"/"+r.total+" 완성";}
+
+function updateVal(id,val){values[id]=val;var r=getTotalCounts();document.getElementById("total-progress").textContent=r.filled+"/"+r.total+" 완성";renderTabs();}
+
 function goStage(i){if(i<0||i>=STAGES.length)return;activeStage=i;render();window.scrollTo({top:0,behavior:"smooth"});}
+
+function getVal(id){return values[id]||"";}
+
 async function askAI(secId){
-  const st=STAGES[activeStage];
-  const sec=st.sections.find(function(s){return s.id===secId;});
-  const val=values[secId]||"";
-  if(!val.trim()){alert("먼저 내용을 입력해주세요!");return;}
-  const btn=document.getElementById("aibtn-"+secId);
-  const resultDiv=document.getElementById("airesult-"+secId);
+  var st=STAGES[activeStage];
+  var sec=null;
+  for(var i=0;i<st.sections.length;i++){if(st.sections[i].id===secId){sec=st.sections[i];break;}}
+  if(!sec||!sec.ai)return;
+
+  var hasContent=false;
+  if(sec.fields){sec.fields.forEach(function(f){if((values[f.id]||"").trim())hasContent=true;});}
+  else{if((values[secId]||"").trim())hasContent=true;}
+  if(!hasContent){alert("먼저 내용을 입력해주세요!");return;}
+
+  var btn=document.getElementById("aibtn-"+secId);
+  var resultDiv=document.getElementById("airesult-"+secId);
   btn.disabled=true;
   btn.innerHTML='<span class="spinner"></span> 생성 중';
   resultDiv.style.display="none";
+
+  var prompt=sec.ai(getVal);
+
   try{
-    const res=await fetch(API_ENDPOINT,{
+    var res=await fetch(API_ENDPOINT,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({
         model:"claude-sonnet-4-20250514",
-        max_tokens:1000,
+        max_tokens:1200,
         system:"당신은 여성창업가를 위한 따뜻하고 실용적인 창업 멘토입니다. 박은정 창업멘토의 맘스타트업 창업 6단계 방법론을 기반으로, 구체적이고 실행 가능한 한국어 조언을 해주세요.",
-        messages:[{role:"user",content:sec.ai(val)}]
+        messages:[{role:"user",content:prompt}]
       })
     });
-    const data=await res.json();
-    const text=(data.content&&data.content[0]&&data.content[0].text)||"응답을 받지 못했습니다.";
-    resultDiv.innerHTML='<div class="ai-result"><div class="ai-result-head"><span class="ai-result-label">✦ Claude 응답</span><button class="ai-result-close" onclick="document.getElementById(\'airesult-'+secId+'\').style.display=\'none\'">✕</button></div><div class="ai-result-text">'+text.replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</div><div class="ai-result-hint">위 내용을 참고해 아래 입력란에 직접 작성해보세요 ↑</div></div>';
+    var data=await res.json();
+    var text=(data.content&&data.content[0]&&data.content[0].text)||"응답을 받지 못했습니다.";
+    resultDiv.innerHTML='<div class="ai-result"><div class="ai-result-head"><span class="ai-result-label">✦ Claude 응답</span><button class="ai-result-close" onclick="document.getElementById(\'airesult-'+secId+'\').style.display=\'none\'">✕</button></div><div class="ai-result-text">'+text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</div><div class="ai-result-hint">위 내용을 참고해 각 입력란에 직접 작성해보세요 ↑</div></div>';
     resultDiv.style.display="block";
   }catch(e){alert("오류: "+e.message);}
   finally{btn.disabled=false;btn.innerHTML="✦ AI 도움받기";}
 }
+
 function saveFile(){
-  let content="";
+  var content="";
   STAGES.forEach(function(st){
     content+="========================================\n"+st.label+" · "+st.title+"\n========================================\n";
-    st.sections.forEach(function(sec){content+="【"+sec.label+"】\n"+(values[sec.id]||"(미작성)")+"\n\n";});
+    st.sections.forEach(function(sec){
+      content+="【"+sec.label+"】\n";
+      if(sec.fields){
+        sec.fields.forEach(function(f){content+=f.label+":\n"+(values[f.id]||"(미작성)")+"\n\n";});
+      }else{
+        content+=(values[sec.id]||"(미작성)")+"\n\n";
+      }
+    });
     content+="\n";
   });
-  const blob=new Blob([content],{type:"text/plain;charset=utf-8"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");a.href=url;a.download="맘스타트업_6단계_워크시트.txt";a.click();
+  var blob=new Blob([content],{type:"text/plain;charset=utf-8"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");a.href=url;a.download="맘스타트업_6단계_워크시트.txt";a.click();
   URL.revokeObjectURL(url);
 }
+
 render();
 </script>
 </body>

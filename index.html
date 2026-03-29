@@ -32,7 +32,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#F8F7FC;color:#1A1A1A}
 .disc-banner-badge{font-size:11px;font-weight:800;color:#FFD0B5;letter-spacing:.08em;margin-bottom:4px}
 .disc-banner-title{font-size:15px;font-weight:800;color:#fff;margin-bottom:4px}
 .disc-banner-sub{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.5}
-.disc-link{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:10px;text-decoration:none;background:#E84500;color:#fff;font-size:13px;font-weight:800;box-shadow:0 2px 8px rgba(232,69,0,0.35);white-space:nowrap}
+.disc-link{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:10px;text-decoration:none;background:#E84500;color:#fff;font-size:13px;font-weight:800;white-space:nowrap}
 .disc-inline{background:#F0E8FF;border:1.5px solid #B39DDB;border-radius:12px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .disc-inline-title{font-size:12px;font-weight:700;color:#7B2FBE;margin-bottom:3px}
 .disc-inline-sub{font-size:13px;color:#666;line-height:1.5}
@@ -77,6 +77,7 @@ textarea:focus{border-color:var(--focus-color,#7B2FBE)}
 <div class="content" id="main-content"></div>
 <script>
 const DISC_URL="https://mnejpark.github.io/disc-test/";
+const API_ENDPOINT="/api/chat";
 const values={};
 const STAGES=[
   {id:1,label:"1단계",title:"가치관 재정립",color:"#7B2FBE",lightBg:"#F0E8FF",desc:"창업의 뿌리가 되는 나만의 가치관을 정립합니다",
@@ -162,7 +163,7 @@ async function askAI(secId){
   const btn=document.getElementById("aibtn-"+secId);const resultDiv=document.getElementById("airesult-"+secId);
   btn.disabled=true;btn.innerHTML=`<span class="spinner"></span> 생성 중`;resultDiv.style.display="none";
   try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:"당신은 여성창업가를 위한 따뜻하고 실용적인 창업 멘토입니다. 박은정 창업멘토의 맘스타트업 창업 6단계 방법론을 기반으로, 구체적이고 실행 가능한 한국어 조언을 해주세요.",messages:[{role:"user",content:sec.ai(val)}]})});
+    const res=await fetch(API_ENDPOINT,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,system:"당신은 여성창업가를 위한 따뜻하고 실용적인 창업 멘토입니다. 박은정 창업멘토의 맘스타트업 창업 6단계 방법론을 기반으로, 구체적이고 실행 가능한 한국어 조언을 해주세요.",messages:[{role:"user",content:sec.ai(val)}]})});
     const data=await res.json();const text=data.content?.[0]?.text||"응답을 받지 못했습니다.";
     resultDiv.innerHTML=`<div class="ai-result"><div class="ai-result-head"><span class="ai-result-label">✦ Claude 응답</span><button class="ai-result-close" onclick="document.getElementById('airesult-${secId}').style.display='none'">✕</button></div><div class="ai-result-text">${text.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</div><div class="ai-result-hint">위 내용을 참고해 아래 입력란에 직접 작성해보세요 ↑</div></div>`;
     resultDiv.style.display="block";

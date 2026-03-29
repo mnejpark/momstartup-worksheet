@@ -99,10 +99,7 @@ const STAGES=[
   {id:3,label:"3단계",title:"아이템 만들기",color:"#7B2FBE",lightBg:"#F0E8FF",desc:"시네틱스 방법으로 나만의 창업 아이템을 도출합니다",
     sections:[
       {id:"s3vp",label:"Vitamin vs Painkiller",question:"Vitamin (활력·Nice to Have) 아이디어:\n\n\nPainkiller (필수·Must Have) 아이디어:",rows:5,disc:false,ai:null},
-      {id:"s3synectics",label:"시네틱스 표 — 아이템 4가지 도출",question:"내가 잘하는 것 / 좋아하는 것:\n\n무작위 요소 (관심사·트렌드):\n\n아이디어 1:\n아이디어 2:\n아이디어 3:\n아이디어 4:",rows:9,disc:false,ai:(v)=>`시네틱스 방법으로 아이템을 도출했습니다.\n내용: "${v}"\nVitamin/Painkiller: "${values.s3vp||""}"\n\n각 아이디어에 대해 1)Vitamin/Painkiller 분류 2)시장성(상/중/하) 3)차별화 포인트를 정리하고, 가장 추천하는 아이템과 이유를 알려주세요.`},
-      {id:"s3final",label:"최종 선택 아이템 & 이유",question:"선택한 아이템:\n\n선택 이유:",rows:4,disc:false,ai:(v)=>`최종 선택한 창업 아이템: "${v}"\n\n이 아이템의 핵심 강점, 예상 타깃 고객, 초기 실행을 위한 가장 작은 첫 번째 단계 3가지를 응원하는 톤으로 구체적으로 알려주세요.`},
-    ]},
-  {id:4,label:"4단계",title:"사업계획서 만들기",color:"#E84500",lightBg:"#FFF3EF",desc:"사업의 설계도인 사업계획서의 핵심을 작성합니다",
+      {id:"s3synectics",label:"시네틱스 — 내가 잘하는 것 & 좋아하는 것",question:"내가 잘하는 것:\n\n내가 좋아하는 것:",rows:5,disc:false,ai:(v)=>`예비 여성창업가의 강점과 관심사입니다:\n${v}\n\n이 정보를 바탕으로 시네틱스(Synectics) 방법을 적용해주세요.\n\n1. 무작위 요소 3가지를 트렌드·사회변화·일상에서 뽑아주세요.\n2. 각 무작위 요소와 위 강점·관심사를 조합해 창업 아이디어를 만들어주세요.\n3. 아래 형식으로 4가지 아이디어를 제안해주세요:\n\n아이디어 1: [아이디어명]\n유형: Vitamin / Painkiller\n한 줄 설명: \n시장성: 상/중/하\n\n아이디어 2: ...\n아이디어 3: ...\n아이디어 4: ...\n\n마지막에 가장 추천하는 아이디어와 이유를 한 줄로 써주세요.`},
     sections:[
       {id:"s4biz",label:"좋은 사업 기준 자가 체크",question:"경쟁력 (나만의 차별점):\n지속력 (반복 구매·이용 가능성):\n명확한 가치제안:\n수익구조 선순환:\n모방 불가능성:",rows:7,disc:false,ai:null},
       {id:"s4nine",label:"수익구조 필수 9가지 요소",question:"① 가치제안:\n② 고객:\n③ 홍보:\n④ 판매채널:\n⑤ 매출방식:\n⑥ 핵심자원:\n⑦ 핵심활동:\n⑧ 핵심파트너:\n⑨ 비용:",rows:11,disc:false,ai:(v)=>`사업 수익구조 9가지 요소:\n아이템: "${values.s3final||values.s3synectics||""}"\n내용: "${v}"\n\n각 요소를 더 구체적으로 채워주세요. 번호 형식 그대로 답변해주세요.`},

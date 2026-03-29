@@ -227,7 +227,7 @@ var STAGES=[
         }},
     ]},
 
-  {id:6,label:"6단계",title:"엄마 기업가정신",color:"#1B8A4C",lightBg:"#E8F5E9",desc:"창업가로서의 정체성을 확립하고 실행을 선언합니다",
+   {id:6,label:"6단계",title:"엄마 기업가정신",color:"#1B8A4C",lightBg:"#E8F5E9",desc:"창업가로서의 정체성을 확립하고 실행을 선언합니다",
     sections:[
       {id:"s6def",label:"나만의 기업가정신 정의",question:"드러커: 기회를 통한 혁신과 실행 / 슘페터: 새로운 조합으로 경제 발전을 이끄는 혁신",
         fields:[{id:"s6def_a",label:"나만의 정의 — '기업가정신이란...'으로 시작해보세요",ph:"기업가정신이란 ",rows:4}],
@@ -249,16 +249,16 @@ var STAGES=[
           {id:"s6fear_3b",label:"극복 한 마디",ph:"",rows:2}
         ],
         ai:function(g){return "두려움1: "+g("s6fear_1a")+"\n두려움2: "+g("s6fear_2a")+"\n두려움3: "+g("s6fear_3a")+"\n\n각 두려움에 현실적이고 용기를 주는 맞춤 조언을 해주세요. 비슷한 두려움을 극복한 여성 창업가 사례도 짧게 언급해주세요.";}},
-      {id:"s6dec",label:"나의 창업 선언문",question:"오늘 강의를 마치며 창업가로서 나 자신에게 선언합니다",
+     {id:"s6present",label:"창업 소감문 & 자기소개 발표",question:"오늘 강의를 마치며 나를 소개하는 짧은 창업 소감문을 써보세요 — 발표용!",
         fields:[
-          {id:"s6dec_1",label:"나의 창업 핵심 가치는",ph:"",rows:2},
-          {id:"s6dec_2",label:"나의 타깃 고객은",ph:"",rows:2},
-          {id:"s6dec_3",label:"내가 가진 가장 큰 창업 강점은",ph:"",rows:2},
-          {id:"s6dec_4",label:"오늘부터 7일 안에 실행할 한 가지",ph:"가장 작고 구체적인 것으로!",rows:2}
+          {id:"s6pre_name",label:"이름",ph:"예) 박은정",rows:1},
+          {id:"s6pre_item",label:"내 창업 아이템 한 줄 소개",ph:"예) 저는 경력단절 여성을 위한 감성 글쓰기 클래스를 창업할 예정입니다.",rows:2},
+          {id:"s6pre_why",label:"내가 이 창업을 하는 이유",ph:"나의 경험과 가치관을 담아서...",rows:3},
+          {id:"s6pre_str",label:"나의 창업 강점",ph:"",rows:2},
+          {id:"s6pre_action",label:"오늘부터 실행할 첫 번째 행동",ph:"",rows:2},
+          {id:"s6pre_cheer",label:"나 자신에게 한 마디 응원",ph:"창업가로서 나에게 보내는 응원의 말",rows:2}
         ],
-        ai:function(g){return "핵심 가치: "+g("s6dec_1")+"\n타깃: "+g("s6dec_2")+"\n강점: "+g("s6dec_3")+"\n7일 실행: "+g("s6dec_4")+"\n아이템: "+g("s3final_item")+"\n\n이 선언문을 더 강력하고 구체적으로 다듬고, 7일 실행 계획을 더 구체적으로 제안해주세요. 창업 멘토로서 따뜻한 응원 메시지로 마무리해주세요.";}},
-    ]},
-];
+        ai:function(g){return "이름: "+g("s6pre_name")+"\n아이템: "+g("s6pre_item")+"\n창업 이유: "+g("s6pre_why")+"\n강점: "+g("s6pre_str")+"\n첫 실행: "+g("s6pre_action")+"\n\n이 내용을 바탕으로 1분 발표용 창업 자기소개문을 써주세요.\n\n형식:\n- 인사 및 이름 소개\n- 창업 아이템 소개\n- 창업하게 된 계기와 이유\n- 나의 강점\n- 앞으로의 첫 번째 실행 계획\n- 마무리 인사\n\n자연스럽고 진정성 있게, 발표했을 때 듣는 사람의 마음에 닿을 수 있도록 써주세요.";}}
 
 function getFieldIds(sec){
   var ids=[];
